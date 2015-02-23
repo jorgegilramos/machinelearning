@@ -72,6 +72,7 @@ The final set of predictors used for classification are as follows.
 ```r
 names(training_data_final)
 ```
+
 #Create cross validation set
 
 We divide the whole set in two parts, we split 70% of observations for training and the 30% remaining for crossvalidation.
@@ -93,48 +94,6 @@ library(randomForest)
 predictor <- randomForest(classe ~ ., data = training)
 ```
 
-```{r, echo=FALSE}
-setwd('/home/user/machine_learning')
-training_data <- read.csv(file="pml-training.csv", na.strings=c("", "NA"), header=TRUE, stringsAsFactors = FALSE)
-testing_data <- read.csv(file="pml-testing.csv", , na.strings=c("", "NA"), header=TRUE, stringsAsFactors = FALSE)
-
-# Create training classe as a factor
-training_data$classe <- as.factor(training_data$classe) 
-
-# Cleaning training and testing data
-training_data_num_NA <- apply(training_data, 2, function(x) {sum(is.na(x))}) 
-training_data_cleaned <- training_data[,which(training_data_num_NA==0)]
-training_data_cleaned$classe <- as.factor(training_data_cleaned$classe) 
-
-testing_data_num_NA <- apply(testing_data, 2, function(x) {sum(is.na(x))}) 
-testing_data_cleaned <- testing_data[,which(testing_data_num_NA==0)]
-
-library(caret)
-numeric_cols <- which(lapply(training_data_cleaned, class) %in% "numeric")
-
-preObj <-preProcess(training_data_cleaned[,numeric_cols], method=c('knnImpute', 'center', 'scale'))
-trainLess1 <- predict(preObj, training_data_cleaned[, numeric_cols])
-trainLess1$classe <- training_data_cleaned$classe
-
-testLess1 <-predict(preObj, testing_data_cleaned[, numeric_cols])
-
-nzv <- nearZeroVar(trainLess1, saveMetrics=TRUE)
-training_data_final <- trainLess1[,nzv$nzv==FALSE]
-
-nzv <- nearZeroVar(testLess1, saveMetrics=TRUE)
-testing_data_final <- testLess1[,nzv$nzv==FALSE]
-
-set.seed(20150222)
-
-inTrain <- createDataPartition(training_data_final$classe, p = 0.70, list=FALSE)
-training <- training_data_final[inTrain,]
-testing <- training_data_final[-inTrain,]
-
-library(randomForest)
-predictor <- randomForest(classe ~ ., data = training)
-predictor
-```
-
 #In sample accuracy
 
 Here, we calculate the in sample accuracy which is the prediction accuracy of our model on the training data set.
@@ -142,11 +101,6 @@ Here, we calculate the in sample accuracy which is the prediction accuracy of ou
 ```r
 training_predictor = predict(predictor, newdata = training)
 accuracy_training = confusionMatrix(training$classe, training_predictor)$overall[1]
-```
-```{r, echo=FALSE}
-training_predictor = predict(predictor, newdata = training)
-accuracy_training = confusionMatrix(training$classe, training_predictor)$overall[1]
-confusionMatrix(training$classe, training_predictor)$overall
 ```
 
 #Out sample accuracy
@@ -158,11 +112,6 @@ We calculate the out of sample accuracy of the model. In other words, this descr
 testing_predictor = predict(predictor, newdata = testing)
 accuracy_testing = confusionMatrix(testing$classe, testing_predictor)$overall[1]
 ```
-```{r, echo=FALSE}
-testing_predictor = predict(predictor, newdata = testing)
-accuracy_testing = confusionMatrix(testing$classe, testing_predictor)$overall[1]
-confusionMatrix(testing$classe, testing_predictor)
-```
 It can be concluded that the algorithm's accuracy is equal to 99.59% and the out of sample error is 0.41%.
 
 #Prediction Assignment
@@ -170,12 +119,7 @@ It can be concluded that the algorithm's accuracy is equal to 99.59% and the out
 Here, we apply the machine learning algorithm we built above, to each of the 20 test cases in the testing data set provided.
 
 ```r
-answers <- predict(predictor, testing_data_cleaned)
-answers <- as.character(answers)
-answers
-```
-```{r, echo=FALSE}
-answers <- predict(predictor, testing_data_cleaned)
+answers <- predict(predictor, testing_data_final)
 answers <- as.character(answers)
 answers
 ```

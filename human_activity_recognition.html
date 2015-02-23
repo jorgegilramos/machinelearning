@@ -111,6 +111,18 @@ nzv &lt;- nearZeroVar(testLess1, saveMetrics=TRUE)
 testing_data_final &lt;- testLess1[,nzv$nzv==FALSE]</code></pre>
 <p>The final set of predictors used for classification are as follows.</p>
 <pre class="r"><code>names(training_data_final)</code></pre>
+<pre><code>## Loading required package: lattice
+## Loading required package: ggplot2</code></pre>
+<pre><code>##  [1] &quot;roll_belt&quot;         &quot;pitch_belt&quot;        &quot;yaw_belt&quot;         
+##  [4] &quot;gyros_belt_x&quot;      &quot;gyros_belt_y&quot;      &quot;gyros_belt_z&quot;     
+##  [7] &quot;roll_arm&quot;          &quot;pitch_arm&quot;         &quot;yaw_arm&quot;          
+## [10] &quot;gyros_arm_x&quot;       &quot;gyros_arm_y&quot;       &quot;gyros_arm_z&quot;      
+## [13] &quot;roll_dumbbell&quot;     &quot;pitch_dumbbell&quot;    &quot;yaw_dumbbell&quot;     
+## [16] &quot;gyros_dumbbell_x&quot;  &quot;gyros_dumbbell_y&quot;  &quot;gyros_dumbbell_z&quot; 
+## [19] &quot;magnet_dumbbell_z&quot; &quot;roll_forearm&quot;      &quot;pitch_forearm&quot;    
+## [22] &quot;yaw_forearm&quot;       &quot;gyros_forearm_x&quot;   &quot;gyros_forearm_y&quot;  
+## [25] &quot;gyros_forearm_z&quot;   &quot;magnet_forearm_y&quot;  &quot;magnet_forearm_z&quot; 
+## [28] &quot;classe&quot;</code></pre>
 </div>
 <div id="create-cross-validation-set" class="section level1">
 <h1>Create cross validation set</h1>
@@ -126,9 +138,7 @@ testing &lt;- training_data_final[-inTrain,]</code></pre>
 <p>Now, using the features in the training dataset, we will build our model using the Random Forest machine learning technique.</p>
 <pre class="r"><code>library(randomForest)
 predictor &lt;- randomForest(classe ~ ., data = training)</code></pre>
-<pre><code>## Loading required package: lattice
-## Loading required package: ggplot2
-## randomForest 4.6-10
+<pre><code>## randomForest 4.6-10
 ## Type rfNews() to see new features/changes/bug fixes.</code></pre>
 <pre><code>## 
 ## Call:
@@ -197,11 +207,11 @@ accuracy_testing = confusionMatrix(testing$classe, testing_predictor)$overall[1]
 <div id="prediction-assignment" class="section level1">
 <h1>Prediction Assignment</h1>
 <p>Here, we apply the machine learning algorithm we built above, to each of the 20 test cases in the testing data set provided.</p>
-<pre class="r"><code>answers &lt;- predict(predictor, testing_data_cleaned)
+<pre class="r"><code>answers &lt;- predict(predictor, testing_data_final)
 answers &lt;- as.character(answers)
 answers</code></pre>
-<pre><code>##  [1] &quot;E&quot; &quot;A&quot; &quot;A&quot; &quot;E&quot; &quot;A&quot; &quot;E&quot; &quot;E&quot; &quot;B&quot; &quot;A&quot; &quot;E&quot; &quot;A&quot; &quot;A&quot; &quot;B&quot; &quot;A&quot; &quot;E&quot; &quot;E&quot; &quot;E&quot;
-## [18] &quot;B&quot; &quot;E&quot; &quot;E&quot;</code></pre>
+<pre><code>##  [1] &quot;B&quot; &quot;A&quot; &quot;B&quot; &quot;A&quot; &quot;A&quot; &quot;E&quot; &quot;D&quot; &quot;B&quot; &quot;A&quot; &quot;A&quot; &quot;B&quot; &quot;C&quot; &quot;B&quot; &quot;A&quot; &quot;E&quot; &quot;E&quot; &quot;A&quot;
+## [18] &quot;B&quot; &quot;B&quot; &quot;B&quot;</code></pre>
 <p>Finally, we write the answers to files as specified by the course instructor using the following code segment.</p>
 <pre class="r"><code>pml_write_files = function(x){
   n = length(x)
